@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIXEL | STUDIO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --red: #E60023;
+            --text: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg); color: var(--text);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* --- SIDEBAR NAV --- */
+        .layout { display: flex; min-height: 100vh; }
+        
+        .sidebar {
+            width: 280px; background: #050505; border-right: 1px solid #222;
+            padding: 40px; position: fixed; height: 100vh; overflow-y: auto;
+        }
+        .logo { font-family: 'Anton'; font-size: 2rem; margin-bottom: 50px; display: block; color: #fff; text-decoration: none; }
+        .logo span { color: var(--red); }
+
+        .section-label { color: #555; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; margin-top: 30px; }
+
+        .menu-item {
+            display: block; padding: 12px 0; color: #888; text-decoration: none;
+            text-transform: uppercase; font-size: 0.85rem; letter-spacing: 1px;
+            transition: 0.3s; cursor: pointer;
+        }
+        .menu-item:hover, .menu-item.active { color: #fff; padding-left: 10px; border-left: 2px solid var(--red); }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            margin-left: 280px; width: calc(100% - 280px);
+            padding: 60px 80px;
+        }
+
+        .tab-content { display: none; animation: fadeIn 0.5s; }
+        .tab-content.active { display: block; }
+
+        h1 { font-family: 'Anton'; font-size: 3rem; margin-bottom: 10px; }
+        p.subtitle { color: #666; margin-bottom: 40px; max-width: 600px; }
+
+        /* --- GALLERY GRID --- */
+        .gallery-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;
+        }
+        
+        /* Link wrapper for cards */
+        .work-link { text-decoration: none; display: block; }
+
+        .work-item { height: 350px; background: #111; border: 1px solid #222; overflow: hidden; position: relative; }
+        .work-item img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; filter: grayscale(100%); }
+        .work-item:hover img { filter: grayscale(0%); transform: scale(1.05); }
+        .tag { position: absolute; bottom: 10px; left: 10px; background: var(--red); color: #fff; padding: 2px 8px; font-size: 0.7rem; font-weight: bold; }
+        
+        /* Overlay text for Project Title */
+        .project-title {
+            position: absolute; top: 20px; left: 20px; 
+            font-family: 'Anton'; font-size: 1.5rem; color: #fff; 
+            text-transform: uppercase; opacity: 0; transition: 0.3s;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+        .work-item:hover .project-title { opacity: 1; top: 15px; }
+
+
+        /* --- FORMS & DRIVES --- */
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; color: #888; font-size: 0.9rem; }
+        input, textarea, select {
+            width: 100%; padding: 15px; background: #111; border: 1px solid #333;
+            color: #fff; outline: none; font-family: 'Inter';
+        }
+        input:focus, textarea:focus { border-color: var(--red); }
+        .submit-btn {
+            background: var(--red); color: #fff; border: none; padding: 15px 40px;
+            font-weight: bold; cursor: pointer; text-transform: uppercase;
+        }
+
+        .drive-box {
+            background: #111; border: 1px solid #333; padding: 50px;
+            text-align: center; max-width: 500px;
+        }
+        .drive-btn {
+            display: inline-block; background: #222; color: #fff; padding: 15px 30px;
+            text-decoration: none; margin-top: 20px; border: 1px solid #444; transition: 0.3s;
+        }
+        .drive-btn:hover { background: var(--red); border-color: var(--red); }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .sidebar { position: relative; width: 100%; height: auto; border-right: none; border-bottom: 1px solid #222; padding: 20px; }
+            .layout { flex-direction: column; }
+            .main-content { margin-left: 0; width: 100%; padding: 40px 20px; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="layout">
+        <aside class="sidebar">
+            <a href="index.html" class="logo">PIXEL<span>.</span></a>
+            
+            <div class="section-label">Featured</div>
+            <div id="btn-recent" class="menu-item" onclick="switchTab('recent', this)" style="color:#fff; border-left:2px solid #555;">Recent Projects</div>
+
+            <div class="section-label">Services</div>
+            <div id="btn-photo" class="menu-item" onclick="switchTab('photo', this)">Photography</div>
+            <div id="btn-graphics" class="menu-item" onclick="switchTab('graphics', this)">Graphic Design</div>
+            <div id="btn-video" class="menu-item" onclick="switchTab('video', this)">Videography</div>
+
+            <div class="section-label">Studio</div>
+            <div id="btn-booking" class="menu-item" onclick="switchTab('booking', this)">Booking</div>
+            <div id="btn-clients" class="menu-item" onclick="switchTab('clients', this)" style="color:var(--red)">Client Access</div>
+            
+            <a href="index.html" class="menu-item" style="margin-top:50px;">&larr; Back Home</a>
+        </aside>
+
+        <main class="main-content">
+            
+            <div id="recent" class="tab-content">
+                <h1>Recent Projects</h1>
+                <p class="subtitle">Latest works from the Pixeltee archives. Click to view full galleries.</p>
+                
+                <div class="gallery-grid">
+                    
+                    <a href="https://pixelteephotography.pixieset.com/tedxbowen/" target="_blank" class="work-link">
+                        <div class="work-item">
+                            <img src="images/tedx.jpg" alt="TedX Bowen">
+                            <div class="project-title">TEDxBOWEN 2025</div>
+                            <span class="tag">EVENT COVERAGE</span>
+                        </div>
+                    </a>
+
+                    <a href="https://pixelteephotography.pixieset.com/nursingdinner/" target="_blank" class="work-link">
+                        <div class="work-item">
+                            <img src="images/nursing.jpg" alt="Nursing Dinner">
+                            <div class="project-title">NURSING DINNER '25</div>
+                            <span class="tag">DINNER / GALA</span>
+                        </div>
+                    </a>
+
+                    <a href="https://pixelteephotography.pixieset.com/coraz/" target="_blank" class="work-link">
+                        <div class="work-item">
+                            <img src="images/coraz.jpg" alt="Coraz Brand">
+                            <div class="project-title">CORAZ BRAND</div>
+                            <span class="tag">FASHION SHOOT</span>
+                        </div>
+                    </a>
+
+                    <a href="https://pixelteephotography.pixieset.com/chunkzthebrand/" target="_blank" class="work-link">
+                        <div class="work-item">
+                            <img src="images/chunkz.jpg" alt="Chunkz The Brand">
+                            <div class="project-title">CHUNKZ THE BRAND</div>
+                            <span class="tag">BRAND SHOOT</span>
+                        </div>
+                    </a>
+
+                </div>
+            </div>
+
+
+            <div id="photo" class="tab-content">
+                <h1>Photography</h1>
+                <p class="subtitle">Portraits, Events, and High Fashion.</p>
+                <div class="gallery-grid">
+                    <div class="work-item">
+                        <img src="images/portraits.jpg" alt="Studio Setup">
+                        <span class="tag">PORTRAITS</span>
+                    </div>
+                    <div class="work-item"><img src="images/nursing.jpg" alt="Event Hall"><span class="tag">EVENTS</span></div>
+                    <div class="work-item"><img src="images/coraz.jpg" alt="Nigerian Fashion"><span class="tag">FASHION</span></div>
+                </div>
+            </div>
+
+            <div id="graphics" class="tab-content">
+                <h1>Graphic Design</h1>
+                <p class="subtitle">Brand identity and layout design.</p>
+                <div class="gallery-grid">
+                    <div class="work-item"><img src="images/graphics.jpg" alt="Work"><span class="tag">BRANDING</span></div>
+                    <div class="work-item"><img src="https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=600" alt="Work"><span class="tag">UI/UX</span></div>
+                </div>
+            </div>
+
+            <div id="video" class="tab-content">
+                <h1>Videography</h1>
+                <p class="subtitle">Cinematic storytelling.</p>
+                <div class="gallery-grid">
+                    <div class="work-item"><img src="images/videography.jpg" alt="Work"><span class="tag">FILM</span></div>
+                    <div class="work-item"><img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600" alt="Work"><span class="tag">AUTO</span></div>
+                </div>
+            </div>
+
+            <div id="booking" class="tab-content">
+                <h1>Book a Session</h1>
+                <p class="subtitle">Tell us about your project.</p>
+                <form style="max-width: 600px;">
+                    <div class="form-group"><label>Name</label><input type="text"></div>
+                    <div class="form-group"><label>Service</label>
+                        <select>
+                            <option>Photography</option>
+                            <option>Graphic Design</option>
+                            <option>Videography</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Details</label><textarea rows="5"></textarea></div>
+                    <button type="button" class="submit-btn">Send Request</button>
+                </form>
+            </div>
+
+            <div id="clients" class="tab-content">
+                <h1>Client Access</h1>
+                <p class="subtitle">Secure delivery portal.</p>
+                <div class="drive-box">
+                    <h3>Google Drive Portal</h3>
+                    <p style="color:#666; margin-top:10px;">Enter your Project ID to proceed.</p>
+                    <a href="https://drive.google.com" target="_blank" class="drive-btn">Open Drive</a>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        function switchTab(tabId, btnElement) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            
+            const tab = document.getElementById(tabId);
+            if (tab) tab.classList.add('active');
+            
+            if(btnElement) btnElement.classList.add('active');
+        }
+
+        window.onload = function() {
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get('tab');
+            
+            if(tab) {
+                const btn = document.getElementById('btn-' + tab);
+                if(btn) switchTab(tab, btn);
+            } else {
+                switchTab('recent', document.getElementById('btn-recent'));
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIXEL PRODUCTIONS | VISUAL UNIVERSE</title>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --red: #E60023;
+            --text-gray: #888;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            cursor: none; /* Custom cursor for desktop */
+        }
+
+        /* --- CAMERA CURSOR --- */
+        #cursor {
+            position: fixed; top: 0; left: 0; 
+            width: 30px; height: 22px; 
+            border: 2px solid var(--red); border-radius: 3px;
+            transform: translate(-50%, -50%); pointer-events: none; z-index: 9999;
+            display: flex; justify-content: center; align-items: center;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        #cursor::after { content: ''; width: 8px; height: 8px; border: 1px solid var(--red); border-radius: 50%; }
+        #cursor::before { content: ''; position: absolute; top: -4px; right: 4px; width: 6px; height: 2px; background: var(--red); }
+        .cursor-hidden { opacity: 0 !important; }
+
+        /* --- HOVER PREVIEW IMAGE --- */
+        #hover-preview {
+            position: fixed; pointer-events: none; opacity: 0; width: 200px; 
+            border: 2px solid var(--red); z-index: 9998; transition: opacity 0.3s; 
+            object-fit: cover; aspect-ratio: 16/9;
+        }
+
+        /* --- NAV --- */
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 30px 50px;
+            display: flex; justify-content: space-between; align-items: center; z-index: 100;
+            mix-blend-mode: difference;
+        }
+        
+        .logo { font-family: 'Anton'; font-size: 1.3rem; letter-spacing: 1px; }
+        .logo span { color: var(--red); }
+        
+        .book-btn {
+            border: 1px solid #fff; padding: 10px 25px; color: #fff; text-decoration: none;
+            text-transform: uppercase; font-weight: bold; font-size: 0.8rem; letter-spacing: 1px;
+            transition: 0.3s; pointer-events: auto; cursor: pointer;
+        }
+        .book-btn:hover { background: var(--red); border-color: var(--red); color: #000; }
+
+        /* --- HERO --- */
+        #hero { position: relative; height: 100vh; width: 100%; overflow: hidden; cursor: none; }
+        canvas { position: absolute; top: 0; left: 0; }
+        
+        .hero-slogan {
+            position: absolute; top: 60%; left: 50%; transform: translateX(-50%);
+            font-family: 'Inter', sans-serif; font-size: 1rem; letter-spacing: 5px;
+            text-transform: uppercase; color: rgba(255,255,255,0.7);
+            text-align: center; width: 100%; pointer-events: none;
+        }
+
+        .scroll-hint {
+            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+            font-size: 0.8rem; text-transform: uppercase; letter-spacing: 3px; color: #555;
+            animation: pulse 2s infinite; pointer-events: none;
+        }
+
+        /* --- SERVICES SECTION (LIQUID GLASS) --- */
+        #works {
+            padding: 100px 10% 50px 10%;
+            background: #050505;
+            position: relative; z-index: 10;
+            cursor: auto; 
+        }
+
+        .section-title { font-family: 'Anton'; font-size: 4rem; margin-bottom: 60px; line-height: 1; text-transform: uppercase; }
+
+        .disciplines-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;
+        }
+
+        /* Liquid Glass Card Styles */
+        .discipline-card {
+            height: 500px; 
+            position: relative; 
+            border: 1px solid #222; 
+            overflow: hidden;
+            text-decoration: none; 
+            color: white; 
+            display: block;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); 
+            border-radius: 0px; 
+        }
+
+        .discipline-card::before {
+            content: ''; position: absolute; top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.6s; z-index: 2; pointer-events: none;
+        }
+        
+        .discipline-card img {
+            width: 100%; height: 100%; object-fit: cover; 
+            filter: grayscale(100%) brightness(0.7); 
+            transition: 0.6s;
+        }
+        
+        .card-label {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            padding: 20px; 
+            background: linear-gradient(to top, #000, transparent);
+            border-top: 1px solid var(--red);
+            transition: 0.6s; z-index: 3;
+        }
+
+        .card-label h3 { font-family: 'Anton'; font-size: 2rem; text-transform: uppercase; margin-bottom: 5px; }
+        .card-label p { font-size: 0.8rem; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Hover State */
+        .discipline-card:hover {
+            border-radius: 40px 0px 40px 0px; 
+            box-shadow: 0 15px 40px rgba(230, 0, 35, 0.15); 
+            transform: translateY(-5px);
+            border-color: rgba(255,255,255,0.3);
+        }
+        .discipline-card:hover::before { left: 100%; }
+        .discipline-card:hover img { filter: grayscale(0%) brightness(1); transform: scale(1.1); }
+        .discipline-card:hover .card-label { background: var(--red); border-radius: 0 0 40px 0; }
+        .discipline-card:hover .card-label h3 { color: #000; }
+        .discipline-card:hover .card-label p { color: #000; }
+
+
+        /* --- RECENT PROJECTS BOX STYLES --- */
+        #recent-cta {
+            padding: 0 10%; 
+            position: relative; 
+            z-index: 10; 
+            cursor: auto;
+            background: #050505; 
+            padding-bottom: 100px;
+        }
+
+        .recent-box {
+            display: block;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 50px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #333;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            transition: 0.5s;
+            position: relative;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+
+        .recent-box h3 {
+            font-family: 'Anton'; font-size: 2.5rem; letter-spacing: 2px; margin-bottom: 20px; color: #fff;
+        }
+        
+        /* Removed P tag styles since text is gone */
+
+        .arrow-btn {
+            font-size: 2rem; color: var(--red); transition: 0.3s; display: inline-block;
+        }
+
+        .recent-box:hover {
+            border-color: var(--red);
+            background: rgba(230, 0, 35, 0.05);
+            transform: scale(1.02);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .recent-box:hover .arrow-btn { transform: translateX(10px); }
+
+        /* --- ABOUT FOUNDER SECTION --- */
+        #about {
+            padding: 100px 10%;
+            background: #000;
+            border-top: 1px solid #222;
+            cursor: auto;
+        }
+
+        .about-layout {
+            display: grid; 
+            grid-template-columns: 1fr 1.5fr; 
+            gap: 60px;
+            align-items: center;
+        }
+
+        .founder-img {
+            width: 100%;
+            height: auto; 
+            border: 1px solid #333;
+            filter: grayscale(100%);
+            transition: 0.5s;
+            display: block; 
+        }
+        
+        .founder-img:hover {
+            filter: grayscale(0%);
+            border-color: var(--red);
+        }
+
+        .founder-label {
+            color: #666; font-size: 0.8rem; letter-spacing: 2px; 
+            margin-bottom: 20px; text-transform: uppercase; display: block;
+        }
+
+        .founder-text {
+            font-family: 'Anton', sans-serif;
+            font-size: 3.5rem;
+            line-height: 1.1;
+            text-transform: uppercase;
+            color: #fff;
+        }
+        
+        .highlight { color: var(--red); }
+        .location { -webkit-text-stroke: 1px #fff; color: transparent; }
+
+        /* --- FOOTER --- */
+        footer {
+            padding: 80px 10%;
+            background: #050505;
+            border-top: 1px solid #222;
+            text-align: center;
+            cursor: auto;
+        }
+        .footer-cta { font-family: 'Inter'; font-size: 0.9rem; letter-spacing: 2px; color: #888; margin-bottom: 30px; text-transform: uppercase; }
+        .social-icons { display: flex; justify-content: center; gap: 40px; margin-bottom: 50px; }
+        .social-link svg { width: 40px; height: 40px; fill: #fff; transition: 0.3s; }
+        .social-link:hover svg { fill: var(--red); transform: scale(1.1); }
+        .copyright { font-size: 0.7rem; color: #444; }
+
+        /* --- MOBILE --- */
+        @media (max-width: 768px) {
+            body { cursor: auto; }
+            #cursor { display: none; }
+            nav { padding: 20px; }
+            .logo { font-size: 1.1rem; } 
+            .book-btn { padding: 8px 15px; font-size: 0.7rem; }
+            .hero-slogan { font-size: 0.8rem; top: 55%; }
+            .disciplines-grid { grid-template-columns: 1fr; gap: 20px; }
+            .discipline-card { height: 350px; }
+            .about-layout { grid-template-columns: 1fr; gap: 30px; }
+            .founder-img { height: auto; } 
+            .founder-text { font-size: 2rem; }
+            #works, #recent-cta, #about, footer { padding: 60px 5%; }
+            .recent-box { padding: 30px; }
+            .recent-box h3 { font-size: 1.8rem; }
+        }
+
+        @keyframes pulse { 0% { opacity:0.3; } 50% { opacity:1; } 100% { opacity:0.3; } }
+    </style>
+</head>
+<body>
+
+    <div id="cursor"></div>
+    <img id="hover-preview" src="" alt="Preview">
+
+    <nav>
+        <div class="logo">PIXEL <span>PRODUCTIONS.</span></div>
+        <a href="portfolio.html?tab=booking" class="book-btn">Book Now</a>
+    </nav>
+
+    <section id="hero">
+        <canvas id="canvas"></canvas>
+        <div class="hero-slogan">Your Moment, Our story...</div>
+        <div class="scroll-hint">Scroll to Explore</div>
+    </section>
+
+    <section id="works" onmouseenter="hideCursor()" onmouseleave="showCursor()">
+        <h2 class="section-title">Our <span style="color:var(--red)">Services</span></h2>
+        
+        <div class="disciplines-grid">
+            <a href="portfolio.html?tab=photo" class="discipline-card">
+                <img src="images/my-photo.jpg" alt="Photography" style="object-position: top;">
+                <div class="card-label"><h3>Photography</h3><p>Portraits & Lifestyle</p></div>
+            </a>
+            
+            <a href="portfolio.html?tab=graphics" class="discipline-card">
+                <img src="images/my-graphics.jpg" alt="Graphics" style="object-position: top;">
+                <div class="card-label"><h3>Graphic Design</h3><p>Branding & Layouts</p></div>
+            </a>
+            
+            <a href="portfolio.html?tab=video" class="discipline-card">
+                <img src="images/video-cover.jpg" alt="Videography" style="object-position: center;">
+                <div class="card-label"><h3>Videography</h3><p>Cinematic & Commercial</p></div>
+            </a>
+        </div>
+    </section>
+
+    <section id="recent-cta" onmouseenter="hideCursor()" onmouseleave="showCursor()">
+        <a href="portfolio.html?tab=recent" class="recent-box">
+            <div class="recent-content">
+                <h3>RECENT PROJECTS</h3>
+                <span class="arrow-btn">&rarr;</span>
+            </div>
+        </a>
+    </section>
+
+    <section id="about" onmouseenter="hideCursor()" onmouseleave="showCursor()">
+        <div class="about-layout">
+            <div class="founder-box">
+                <img src="images/founder.jpg" alt="Ojo Daniel" class="founder-img">
+            </div>
+            <div class="founder-content">
+                <span class="founder-label">Meet The Founder</span>
+                <div class="founder-text">
+                    Ojo Daniel is a Nigerian <span class="highlight">Videographer / Photographer</span> based between <span class="location">Abuja</span> and <span class="location">Bowen University</span>.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer onmouseenter="hideCursor()" onmouseleave="showCursor()">
+        <div class="footer-cta">Reach out to us on social media</div>
+        
+        <div class="social-icons">
+            <a href="https://www.instagram.com/pixeltee_/" target="_blank" class="social-link">
+                <svg viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </a>
+
+            <a href="https://www.tiktok.com/@pixeltee_?lang=en" target="_blank" class="social-link">
+                <svg viewBox="0 0 24 24" fill="white"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.65-1.58-1.12-.01 2.95 0 5.91-.02 8.87-.18 3.58-3.3 6.64-6.98 6.35-3.38-.27-6.04-3.13-5.91-6.57.13-3.08 2.66-5.59 5.76-5.69v4.02c-1.14.07-2.12.92-2.19 2.07-.07 1.14.76 2.16 1.88 2.33 1.15.17 2.29-.53 2.66-1.63.14-.42.21-.86.21-1.31v-12.32h4.57z"/></svg>
+            </a>
+
+            <a href="https://wa.me/message/I65V65UPOIOOL1" target="_blank" class="social-link">
+                <svg viewBox="0 0 24 24" fill="white"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.463 1.065 2.876 1.213 3.074.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+            </a>
+        </div>
+        <div class="copyright">&copy; 2025 PIXELTEE VISUALS.</div>
+    </footer>
+
+    <script>
+        const cursor = document.getElementById('cursor');
+        const previewImg = document.getElementById('hover-preview');
+        const mouse = { x: 0, y: 0, radius: 60 }; 
+        
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX; mouse.y = e.clientY;
+            cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+            previewImg.style.left = (e.clientX + 20) + 'px'; previewImg.style.top = (e.clientY + 20) + 'px';
+        });
+
+        function hideCursor() { cursor.classList.add('cursor-hidden'); document.body.style.cursor = 'auto'; }
+        function showCursor() { cursor.classList.remove('cursor-hidden'); document.body.style.cursor = 'none'; }
+
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+
+        let particles = [];
+        let stars = [];
+        let specialStars = [];
+
+        class Particle {
+            constructor(x, y) {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.originX = x; this.originY = y;
+                this.size = 2; this.color = '#E60023';
+                this.vx = 0; this.vy = 0;
+            }
+            update() {
+                const dx = mouse.x - this.x; const dy = mouse.y - this.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                const force = (mouse.radius - dist) / mouse.radius;
+
+                if (dist < mouse.radius) {
+                    const angle = Math.atan2(dy, dx);
+                    this.vx -= Math.cos(angle) * force * 5; this.vy -= Math.sin(angle) * force * 5;
+                    this.color = '#fff'; 
+                } else {
+                    this.vx += (this.originX - this.x) * 0.1; this.vy += (this.originY - this.y) * 0.1;
+                    this.color = '#E60023';
+                }
+                this.vx *= 0.9; this.vy *= 0.9;
+                this.x += this.vx; this.y += this.vy;
+            }
+            draw() { ctx.fillStyle = this.color; ctx.fillRect(this.x, this.y, this.size, this.size); }
+        }
+
+        class Star {
+            constructor() {
+                this.x = Math.random() * canvas.width; this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 1.5; this.speed = Math.random() * 0.5;
+                this.alpha = Math.random();
+            }
+            update() {
+                this.y -= this.speed; 
+                if(this.y < 0) this.y = canvas.height;
+                this.alpha = 0.3 + Math.random() * 0.7;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 255, 255, ${this.alpha})`;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+            }
+        }
+
+        class SpecialStar {
+            constructor(imgUrl, x, y) {
+                this.x = x; this.y = y;
+                this.size = 6; this.color = '#E60023'; 
+                this.img = imgUrl; this.hovered = false;
+                this.speedY = (Math.random() * 0.4) + 0.1;
+            }
+            update() {
+                this.y -= this.speedY;
+                if(this.y < 0) this.y = canvas.height;
+
+                const dx = mouse.x - this.x; const dy = mouse.y - this.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+
+                if (dist < 30) { 
+                    if (!this.hovered) {
+                        this.hovered = true;
+                        previewImg.src = this.img; 
+                        previewImg.style.opacity = 1; 
+                        cursor.style.transform = "translate(-50%, -50%) scale(1.5)"; 
+                    }
+                } else {
+                    if (this.hovered) {
+                        this.hovered = false;
+                        previewImg.style.opacity = 0; 
+                        cursor.style.transform = "translate(-50%, -50%) scale(1)"; 
+                    }
+                }
+            }
+            draw() {
+                ctx.shadowBlur = 15; ctx.shadowColor = this.color; ctx.fillStyle = this.color;
+                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
+                ctx.shadowBlur = 0; 
+            }
+        }
+
+        function init() {
+            let fontSize = window.innerWidth < 768 ? '25vw' : '20vw';
+            ctx.font = `900 ${fontSize} Anton`; 
+            ctx.fillStyle = 'white'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText('PIXEL', canvas.width/2, canvas.height/2);
+            
+            const data = ctx.getImageData(0,0, canvas.width, canvas.height).data;
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+
+            let step = window.innerWidth < 768 ? 6 : 8;
+            particles = [];
+            for(let y=0; y<canvas.height; y+=step) {
+                for(let x=0; x<canvas.width; x+=step) {
+                    if(data[(y*4*canvas.width)+(x*4)+3] > 128) particles.push(new Particle(x, y));
+                }
+            }
+            
+            stars = [];
+            for(let i=0; i<100; i++) stars.push(new Star());
+
+            specialStars = [];
+            let zoneWidth = canvas.width / 3;
+            let padding = 50;
+
+            // --- RED STARS CONFIGURATION (Using Local Images) ---
+            
+            // Star 1: Left Zone (Matches Photography)
+            let x1 = (Math.random() * (zoneWidth - 2*padding)) + padding;
+            let y1 = Math.random() * (canvas.height - 200) + 100;
+            specialStars.push(new SpecialStar('images/my-photo.jpg', x1, y1));
+
+            // Star 2: Center Zone (Matches Graphics)
+            let x2 = zoneWidth + (Math.random() * (zoneWidth - 2*padding)) + padding;
+            let y2 = Math.random() * (canvas.height - 200) + 100;
+            specialStars.push(new SpecialStar('images/my-graphics.jpg', x2, y2));
+
+            // Star 3: Right Zone (Matches Videography)
+            let x3 = (zoneWidth * 2) + (Math.random() * (zoneWidth - 2*padding)) + padding;
+            let y3 = Math.random() * (canvas.height - 200) + 100;
+            specialStars.push(new SpecialStar('images/video-cover.jpg', x3, y3));
+        }
+
+        function animate() {
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            stars.forEach(s => { s.update(); s.draw(); });
+            specialStars.forEach(ss => { ss.update(); ss.draw(); });
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+
+        init(); animate();
+        
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                init();
+            }, 100);
+        });
+    </script>
+</body>
+</html>
